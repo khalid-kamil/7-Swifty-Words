@@ -24,6 +24,7 @@ class ViewController: UIViewController {
         }
     }
     var level = 1
+    var correctAnswers = 0
     
     
     override func loadView() {
@@ -75,6 +76,9 @@ class ViewController: UIViewController {
         
         let buttonsView = UIView()
         buttonsView.translatesAutoresizingMaskIntoConstraints = false
+        buttonsView.layer.borderColor = UIColor.lightGray.cgColor
+        buttonsView.layer.borderWidth = 2
+        buttonsView.layer.cornerRadius = 20
         view.addSubview(buttonsView)
         
         NSLayoutConstraint.activate([
@@ -164,13 +168,30 @@ class ViewController: UIViewController {
             
             currentAnswer.text = ""
             score += 1
+            correctAnswers += 1
             
-            if score % 7 == 0 {
+            if correctAnswers % 7 == 0 {
                 let ac = UIAlertController(title: "Well done!", message: "Are you ready for the next level?", preferredStyle: .alert)
                 ac.addAction(UIAlertAction(title: "Let's go!", style: .default, handler: levelUp))
                 present(ac, animated: true, completion: nil)
             }
+            
+        } else {
+            currentAnswer.text = ""
+            score -= 1
+            
+            for btn in activatedButtons {
+                btn.isHidden = false
+            }
+            
+            activatedButtons.removeAll()
+            
+            let ac = UIAlertController(title: "Unlucky!", message: "The word you guessed in incorrect. ", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Try again", style: .default, handler: nil))
+            present(ac, animated: true, completion: nil)
         }
+        
+        
     }
     
     @objc func clearTapped(_ sender: UIButton) {
@@ -206,7 +227,6 @@ class ViewController: UIViewController {
                     
                     let bits = answer.components(separatedBy: "|")
                     letterBits += bits
-                    print(letterBits.count)
                 }
             }
         }
